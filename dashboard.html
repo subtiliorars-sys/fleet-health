@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Health</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#c9d1d9;padding:24px;max-width:1200px;margin:auto}
+h1{color:#58a6ff;margin-bottom:8px;font-size:1.6rem}
+h2{color:#8b949e;font-size:1rem;margin:20px 0 10px;text-transform:uppercase;letter-spacing:1px}
+.subtitle{color:#8b949e;font-size:0.85rem;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px}
+.card h3{font-size:0.95rem;margin-bottom:8px}
+.ok{color:#3fb950}.down{color:#f85149}.degraded{color:#d29922}
+.stat{font-size:0.85rem;margin:4px 0}
+.stat-label{color:#8b949e}
+a{color:#58a6ff;text-decoration:none}
+a:hover{text-decoration:underline}
+.summary{display:flex;gap:16px;margin:16px 0;flex-wrap:wrap}
+.summary-item{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 20px;text-align:center;min-width:120px}
+.summary-item .number{font-size:1.8rem;font-weight:700}
+.summary-item .label{font-size:0.75rem;color:#8b949e}
+.list{list-style:none}
+.list li{font-size:0.85rem;padding:4px 0;border-bottom:1px solid #21262d}
+.list li:last-child{border:none}
+.kanban-link{display:inline-block;margin:10px 0;padding:8px 16px;background:#238636;color:#fff;border-radius:6px;font-weight:600;font-size:0.85rem}
+.meta{margin-top:32px;padding-top:16px;border-top:1px solid #30363d;font-size:0.8rem;color:#484f58}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600}
+.badge-yellow{background:#4d3c1a;color:#d29922}
+#loading{text-align:center;padding:40px;color:#8b949e}
+.error{color:#f85149}
+</style>
+</head>
+<body>
+<h1>Fleet Health</h1>
+<p class="subtitle">subtiliorars-sys | <span id="ts">loading...</span></p>
+<a class="kanban-link" href="https://github.com/users/subtiliorars-sys/projects/1" target="_blank">Open Kanban Board</a>
+<div class="summary" id="summary"><div class="summary-item"><div style="color:#8b949e;font-size:1.2rem">Loading...</div></div></div>
+<h2>Services</h2>
+<div class="grid" id="services"><p id="loading">Fetching status...</p></div>
+<h2>Open Pull Requests</h2>
+<div class="grid" id="prs"></div>
+<div class="meta">Auto-refresh every 60s · <a href="/api/status">JSON API</a></div>
+<script>
+async function refresh(){try{
+const r=await fetch('/api/status'),d=await r.json();
+document.getElementById('ts').textContent=new Date(d.updated).toLocaleString();
+const sum=d.summary;
+document.getElementById('summary').innerHTML=
+`<div class="summary-item"><div class="number" style="color:#3fb950">${sum.total_repos}</div><div class="label">Repos</div></div>
+<div class="summary-item"><div class="number" style="color:#58a6ff">${sum.open_prs}</div><div class="label">Open PRs</div></div>
+<div class="summary-item"><div class="number" style="color:#d29922">${sum.todo_issues}</div><div class="label">Todo</div></div>`;
+const svcHtml=Object.entries(d.services).map(([n,s])=>
+`<div class="card"><h3 class="${s.ok?'ok':'down'}">${s.ok?'&#10003;':'&#10007;'} ${n}</h3>
+<div class="stat"><span class="stat-label">Status:</span> ${s.status||'error'}</div>
+<div class="stat"><span class="stat-label">Latency:</span> ${s.latency_ms?s.latency_ms.toFixed(0)+'ms':'N/A'}</div></div>`
+).join('');
+document.getElementById('services').innerHTML=svcHtml||'<div class="card"><h3>No services</h3></div>';
+const prHtml=Object.entries(d.prs).filter(([,p])=>p.length).map(([r,ps])=>
+`<div class="card"><h3>${r} (${ps.length})</h3><ul class="list">${ps.map(p=>
+`<li><a href="${p.url}" target="_blank">#${p.number}</a> ${p.title}${p.draft?' <span class="badge badge-yellow">Draft</span>':''}</li>`
+).join('')}</ul></div>`
+).join('');
+document.getElementById('prs').innerHTML=prHtml||'<div class="card"><h3>No open PRs</h3></div>';
+}catch(e){document.getElementById('services').innerHTML=`<div class="card error">Failed to load: ${e.message}</div>`}}
+refresh();setInterval(refresh,60000);
+</script>
+</body>
+</html>

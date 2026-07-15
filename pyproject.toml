@@ -1,0 +1,10 @@
+[project]
+name = "fleet-health"
+version = "0.1.0"
+description = "Cross-project health dashboard for subtiliorars-sys fleet"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.139.0",
+    "httpx>=0.28.1",
+    "uvicorn[standard]>=0.51.0",
+]
