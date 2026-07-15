@@ -12,12 +12,14 @@ app = FastAPI(title="Fleet Health Dashboard", version="0.1.0")
 SERVICES = {
     "CodeMonkeys": {"url": "https://codemonkeys.fly.dev/healthz", "type": "health", "repo": "subtiliorars-sys/CodeMonkeys"},
     "OmniTender CRM": {"url": "https://omnitender-crm.fly.dev/", "type": "web", "repo": "subtiliorars-sys/OmniTenderCRM"},
+    "Crypto Exchange": {"url": "https://backend-lucid-harbor-7653.fly.dev/api/v1/health", "type": "health", "repo": "subtiliorars-sys/crypto"},
+    "Fleet Health": {"url": "https://fleet-health.fly.dev/health", "type": "health", "repo": "subtiliorars-sys/fleet-health"},
 }
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_HEADERS = {"Authorization": f"Bearer {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 GITHUB_OWNER = "subtiliorars-sys"
-REPOS = ["CodeMonkeys","OmniTender","OmniTenderCRM","crypto","scribe-dictation","jimmythehat-volunteers","neural-network"]
+REPOS = ["CodeMonkeys","OmniTender","OmniTenderCRM","crypto","scribe-dictation","jimmythehat-volunteers","neural-network","fleet-health"]
 
 
 async def check_health(url: str) -> dict:
