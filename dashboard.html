@@ -55,7 +55,9 @@ document.getElementById('summary').innerHTML=
 const svcHtml=Object.entries(d.services).map(([n,s])=>
 `<div class="card"><h3 class="${s.ok?'ok':'down'}">${s.ok?'&#10003;':'&#10007;'} ${n}</h3>
 <div class="stat"><span class="stat-label">Status:</span> ${s.status||'error'}</div>
-<div class="stat"><span class="stat-label">Latency:</span> ${s.latency_ms?s.latency_ms.toFixed(0)+'ms':'N/A'}</div></div>`
+<div class="stat"><span class="stat-label">Latency:</span> ${s.latency_ms?s.latency_ms.toFixed(0)+'ms':'N/A'}</div>
+${s.note?`<div class="stat" style="font-size:0.78rem;color:#8b949e;margin-top:4px">${s.note}</div>`:''}
+${s.repo?`<div class="stat"><a href="https://github.com/${s.repo}" target="_blank">${s.repo}</a></div>`:''}</div>`
 ).join('');
 document.getElementById('services').innerHTML=svcHtml||'<div class="card"><h3>No services</h3></div>';
 const prHtml=Object.entries(d.prs).filter(([,p])=>p.length).map(([r,ps])=>
